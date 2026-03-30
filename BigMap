@@ -1,0 +1,335 @@
+<!-- Combined Dance Map (Squarespace-ready) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap');
+:root{
+  --teacher:#2f6da3;
+  --teacher-soft:#e5f0f9;
+  --event:#b86a2a;
+  --event-soft:#f9ecde;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --line:#d9dfeb;
+  --panel:#ffffff;
+  --surface:#f6f2ea;
+}
+#sj-wrap{
+  font-family:'Manrope',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 420px at 15% -20%, #ece2d2 0%, transparent 60%),
+    radial-gradient(1200px 360px at 100% -25%, #e7edf8 0%, transparent 65%),
+    var(--surface);
+  border:1px solid #e6e0d3;
+  border-radius:20px;
+  padding:clamp(12px,2vw,20px);
+}
+#sj-head{
+  position:sticky;
+  top:0;
+  z-index:40;
+  padding:10px;
+  margin:-10px -10px 14px;
+  background:rgba(246,242,234,.86);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid #e8e0cf;
+}
+.sj-title{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.sj-title h1{margin:0;font:700 clamp(1.4rem,2.4vw,2rem)/1.1 'Fraunces',serif;letter-spacing:.2px}
+.sj-title p{margin:0;color:var(--muted);font-size:14px}
+.sj-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#sj-search{
+  flex:1 1 300px;
+  min-width:220px;
+  padding:11px 13px;
+  border:1px solid #ccd5e4;
+  border-radius:12px;
+  background:#fff;
+}
+#sj-search:focus{outline:none;border-color:#8ca9ca;box-shadow:0 0 0 3px rgba(47,109,163,.15)}
+#sj-type{
+  display:inline-flex;
+  gap:4px;
+  padding:4px;
+  border:1px solid #ccd5e4;
+  background:#fff;
+  border-radius:12px;
+}
+#sj-type button{
+  padding:8px 12px;
+  border:0;
+  background:transparent;
+  border-radius:9px;
+  color:#334155;
+  font-weight:600;
+  cursor:pointer;
+  transition:.18s ease;
+}
+#sj-type button:hover{background:#edf2f9}
+#sj-type button[aria-pressed="true"]{background:#1e2d3f;color:#fff}
+.sj-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 10px;
+  border:1px solid #ccd5e4;
+  border-radius:12px;
+  background:#fff;
+  color:#334155;
+  font-size:14px;
+}
+#sj-fit{
+  border:1px solid #c5cfdf;
+  background:#fff;
+  color:#334155;
+  padding:9px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.18s ease;
+}
+#sj-fit:hover{background:#eef3f9;border-color:#9fb0cb}
+.sj-legend{margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#4b5563}
+.sj-key{display:inline-flex;align-items:center;gap:7px}
+.sj-key-dot,.sj-key-square{width:12px;height:12px;border:2px solid #fff;box-shadow:0 0 0 1px #cad4e2}
+.sj-key-dot{border-radius:999px;background:var(--teacher)}
+.sj-key-square{background:var(--event);border-radius:3px}
+#sj-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.95fr);gap:16px}
+#sj-map-shell{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 10px 24px rgba(28,38,64,.07)}
+#sj-map{height:560px;border:1px solid #d7deeb;border-radius:12px;overflow:hidden}
+#sj-list-panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;max-height:576px;overflow:auto;box-shadow:0 10px 24px rgba(28,38,64,.07)}
+#sj-list-title{margin:0 0 6px;font:600 1.05rem/1.2 'Manrope',sans-serif}
+#sj-note{margin:0 0 12px}
+.sj-card{border:1px solid #d9dfeb;border-radius:13px;padding:12px;margin:0 0 10px;background:linear-gradient(180deg,#fff,#fdfdfd);box-shadow:0 2px 8px rgba(28,38,64,.04);cursor:pointer;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
+.sj-card:hover{transform:translateY(-1px);box-shadow:0 9px 18px rgba(28,38,64,.09)}
+.sj-card.sj-card--teacher{border-left:4px solid var(--teacher)}
+.sj-card.sj-card--event{border-left:4px solid var(--event)}
+.sj-card-kind{display:inline-block;font-size:11px;letter-spacing:.04em;font-weight:700;text-transform:uppercase;border-radius:999px;padding:3px 8px;margin-bottom:7px}
+.sj-card--teacher .sj-card-kind{background:var(--teacher-soft);color:#1f4d73}
+.sj-card--event .sj-card-kind{background:var(--event-soft);color:#744217}
+.sj-card h3{margin:0 0 7px;font-size:16px;line-height:1.25}
+.sj-card p{margin:3px 0;font-size:14px;color:#334155}
+.sj-links{margin-top:8px}
+.sj-links a{color:#2f4e75;font-size:13px;text-decoration:none;margin-right:10px;border-bottom:1px dotted rgba(47,78,117,.4)}
+.sj-links a:hover{color:#1e3755;border-bottom-color:#1e3755}
+.sj-muted{color:var(--muted)}
+#sj-wrap .leaflet-popup-content{font-family:'Manrope',sans-serif}
+.sj-event-pin{width:22px;height:22px;border-radius:4px;border:2px solid #fff;background:var(--event);color:#fff;display:flex;align-items:center;justify-content:center;font:700 10px/1 'Manrope',sans-serif;box-shadow:0 5px 12px rgba(41,48,66,.25)}
+@media (max-width:980px){
+  #sj-main{grid-template-columns:1fr}
+  #sj-map{height:58vh;min-height:360px}
+  #sj-list-panel{max-height:none;overflow:visible;border-radius:14px}
+}
+@media (max-width:620px){
+  .sj-title p{width:100%}
+  #sj-head{margin:-10px -10px 10px}
+  .sj-controls{gap:6px}
+  #sj-type button{padding:7px 9px;font-size:13px}
+  .sj-toggle,#sj-fit{font-size:13px}
+}
+</style>
+<div id="sj-wrap">
+  <div id="sj-head">
+    <div class="sj-title">
+      <h1>StripMap</h1>
+      <p>Discover teachers and events in one shared map.</p>
+    </div>
+    <div class="sj-controls">
+      <input id="sj-search" type="search" placeholder="Search teacher, event, city, country, style..."/>
+      <div id="sj-type">
+        <button data-type="all" aria-pressed="true">All</button>
+        <button data-type="teacher" aria-pressed="false">Teachers</button>
+        <button data-type="event" aria-pressed="false">Events</button>
+      </div>
+      <label class="sj-toggle"><input id="sj-show-past" type="checkbox"/> Show past events</label>
+      <button id="sj-fit" type="button">Fit visible</button>
+    </div>
+    <div class="sj-legend">
+      <span class="sj-key"><span class="sj-key-dot"></span>Teacher marker</span>
+      <span class="sj-key"><span class="sj-key-square"></span>Event marker</span>
+    </div>
+  </div>
+
+  <div id="sj-main">
+    <div id="sj-map-shell">
+      <div id="sj-map"></div>
+    </div>
+    <aside id="sj-list-panel">
+      <h2 id="sj-list-title">Results</h2>
+      <p id="sj-note" class="sj-muted"></p>
+      <div id="sj-cards"></div>
+    </aside>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const teachers=[
+    { name:"Elena Smith", city:"Palm Springs", country:"USA", style:"Floorwork, Frame Up", IG:"https://instagram.com/lesupova_dance", coordinates:[33.8246269,-116.540303], website:"https://lesupovadance.thinkific.com/", episode:{ number:"01", link:"https://www.stripjourney.com/episodes/interview-ellena-smith-99sy4-4zj89" } },
+    { name:"Deny Grigorik", city:"Prague", country:"Czech Republic", style:"Pole Dance, Frame Up", IG:"https://www.instagram.com/stories/_d_e_motion", coordinates:[50.0596288,14.4464593], episode:{ number:"02", link:"https://www.stripjourney.com/episodes/interview-deny-grigorik" } },
+    { name:"Anastasia Vlasova", city:"London", country:"United Kingdom", style:"Frame Up, High heels", IG:"https://www.instagram.com/stories/nastish_vlasova", coordinates:[51.4893335,-0.1440551], website:"https://www.frame-up.uk/", episode:{ number:"03", link:"https://www.stripjourney.com/episodes/interview-anastasia-vlasova" } },
+    { name:"Eve", city:"Prague", country:"Czech Republic", style:"Frame Up", IG:"https://www.instagram.com/eve_archarly", episode:{ number:"04", link:"https://www.stripjourney.com/episodes/interview-eve" } },
+    { name:"Daria", city:"Düsseldorf", country:"Germany", style:"Pole dance, Frame Up, High heels", IG:"https://www.instagram.com/daring.daria", coordinates:[51.2254018,6.7763137], episode:{ number:"05", link:"https://www.stripjourney.com/episodes/interview-daria" } },
+    { name:"Anastasiia Urmanavichius", city:"Amsterdam", country:"Netherlands", style:"Frame Up", IG:"https://www.instagram.com/ness_lynx", coordinates:[52.3730796,4.8924534], episode:{ number:"06", link:"https://www.stripjourney.com/episodes/interview-anastasia-amsterdam" } },
+    { name:"Vlada Kosha", city:"Hamburg", country:"Germany", style:"High heels, Frame Up", IG:"https://instagram.com/vladakosha", coordinates:[53.550341,10.000654], website:"https://www.eversports.de/s/hheels", episode:{ number:"07", link:"https://www.stripjourney.com/episodes/interview-vlada-kosha" } },
+    { name:"Lily", city:"Buenos Aires", country:"Argentina", style:"Pole dance, Frame Up", IG:"https://www.instagram.com/liclaudine", coordinates:[-34.61315,-58.37723], episode:{ number:"08", link:"https://www.stripjourney.com/episodes/interview-lily" } },
+    { name:"Alina Makovska", city:"Hannover", country:"Germany", style:"Strip", IG:"https://www.instagram.com/ad_makovskaya", coordinates:[52.3744779,9.7385532], episode:{ number:"09", link:"https://www.stripjourney.com/episodes/interview-alina-makovska" } },
+    { name:"Anastasia Levenson", city:"Lisbon", country:"Portugal", style:"High heels, Frame Up", IG:"https://www.instagram.com/levenson.anastasia", coordinates:[38.7077507,-9.1365919], website:"https://lvnsn.art/", episode:{ number:"10", link:"https://www.stripjourney.com/episodes/interview-anastasia-levenson" } },
+    { name:"Anastasia Levenson", city:"Riga", country:"Latvia", style:"High heels, Frame Up", IG:"https://www.instagram.com/levenson.anastasia", coordinates:[56.9493977,24.1051846], website:"https://lvnsn.art/", episode:{ number:"10", link:"https://www.stripjourney.com/episodes/interview-anastasia-levenson" } },
+    { name:"Eva Marta", city:"Dresden", country:"Germany", style:"Ballet, Frame Up", IG:"https://www.instagram.com/suspiria.em/", coordinates:[51.0493286,13.7381437], episode:{ number:"11", link:"https://www.stripjourney.com/episodes/interview-eva-marta" } },
+    { name:"Irina", city:"Hannover", country:"Germany", style:"High heels, Frame Up", IG:"https://www.instagram.com/kaz.irk", episode:{ number:"12", link:"https://www.stripjourney.com/episodes/interview-irina" } },
+    { name:"Randa", city:"Helsinki", country:"Finland", style:"Floorwork acrobatics", IG:"https://www.instagram.com/morella.dance", coordinates:[60.1674881,24.9427473], episode:{ number:"13", link:"https://www.stripjourney.com/episodes/interview-randa" } },
+    { name:"Tanya", city:"New Jersey", country:"USA", style:"Frame Up", IG:"https://www.instagram.com/tanya_phoenix", coordinates:[40.0757384,-74.4041622], episode:{ number:"14", link:"https://www.stripjourney.com/episodes/interview-tanya" } },
+    { name:"Alina Boshchenko", city:"Amsterdam", country:"Netherlands", style:"Frame Up", IG:"https://www.instagram.com/lesslyrics_", episode:{ number:"16", link:"https://www.stripjourney.com/episodes/interview-alina-b" } },
+    { name:"Iliana", city:"Plovdiv", country:"Bulgaria", style:"Strip, Exotic Pole", IG:"https://www.instagram.com/i.bancheva", coordinates:[42.1418541,24.7499297] },
+    { name:"Yasha", city:"Prague", country:"Czech Republic", style:"Frame Up", IG:"https://www.instagram.com/yasha_vasha", episode:{ number:"20", link:"https://www.stripjourney.com/episodes/interview-yasha" }, website:"https://www.instagram.com/ultima.thule.art" },
+    { name:"Liza Makarova", city:"Prague", country:"Czech Republic", style:"Frame Up", IG:"https://www.instagram.com/foxmakarova", episode:{ number:"23", link:"https://www.stripjourney.com/episodes/episode23-liza-makarova" } },
+    { name:"Mia Lê", city:"Helsinki", country:"Finland", style:"Strip", IG:"https://www.instagram.com/mialenotlee" },
+    { name:"Kateryna", city:"Stuttgart", country:"Germany", style:"Strip", IG:"https://www.instagram.com/ktgbrv", coordinates:[48.7784485,9.1800132] },
+    { name:"Mariia Mariutina", city:"Belgrade", country:"Serbia", style:"Frame Up Strip", IG:"https://www.instagram.com/masha_mahich", coordinates:[44.8178131,20.4568974], episode:{ number:"21", link:"https://www.stripjourney.com/episodes/interview-mariia-mariutina" } },
+    { name:"Varya Balashova", city:"Bremen", country:"Germany", style:"Strip, jazz funk, high heels", IG:"https://www.instagram.com/_thundery_", coordinates:[53.0758196,8.8071646] },
+    { name:"Alisa", city:"Budapest", country:"Hungary", style:"Frame Up Strip", IG:"https://www.instagram.com/alisa.dubolari", coordinates:[47.4978789,19.0402383], website:"https://www.instagram.com/skydance.team" },
+    { name:"Nata Bella", city:"Manchester", country:"United Kingdom", style:"Strip, Exotic High Heels ", IG:"https://www.instagram.com/natabella.artist", coordinates:[53.4794892,-2.2451148], website:"https://www.instagram.com/natabellaclub" },
+    { name:"Nata Bella", city:"Liverpool", country:"United Kingdom", style:"Strip, Exotic High Heels ", IG:"https://www.instagram.com/natabella.artist", coordinates:[53.4084,-2.9916], website:"https://www.instagram.com/natabellaclub" },
+    { name:"Alexandra Andries", city:"Chisinau", country:"Moldova", style:"Frame Up Strip", IG:"https://www.instagram.com/_alexandra_andriesh_", coordinates:[47.0245117,28.8322923], website:"https://www.instagram.com/skydance.md" },
+    { name:"Anna Lapchenko", city:"Prague", country:"Czech Republic", style:"Frame Up Strip", IG:"https://www.instagram.com/lapchenkoanna" },
+    { name:"Anna Solokhina", city:"Wrocław", country:"Poland", style:"Frame Up Strip", IG:"https://www.instagram.com/anna.solokhina1", coordinates:[51.1089776,17.0326689] },
+    { name:"Svetlana Hudabašjana", city:"Riga", country:"Latvia", style:"Frame Up Strip", IG:"https://www.instagram.com/_svetlana_1228" },
+    { name:"Tatiana Pawlak", city:"Poznań", country:"Poland", style:"Strip", IG:"https://www.instagram.com/tatiana_pawlak", coordinates:[52.4082663,16.9335199], episode:{ number:"18", link:"https://www.stripjourney.com/episodes/interview-tatiana" } },
+    { name:"Tanja", city:"Munich", country:"Germany", style:"Frame Up, High Heels, Floorwork", IG:"https://www.instagram.com/bogushtanja", coordinates:[48.1371079,11.5753822] },
+    { name:"Olga Malakhova", city:"Thessaloniki", country:"Greece", style:"Frame Up Strip", IG:"https://www.instagram.com/lomovueva", coordinates:[40.6403167,22.9352716] },
+    { name:"Anna Slide", city:"Frankfurt", country:"Germany", style:"Frame Up, High heels", IG:"https://www.instagram.com/annaslide", coordinates:[50.1106444,8.6820917], episode:{ number:"19", link:"https://www.stripjourney.com/episodes/interview-anna-slide" } },
+    { name:"Yevgeniya", city:"Hamburg", country:"Germany", style:"Frame up , Latin Dance", IG:"https://www.instagram.com/yevgeniyaa.sch" },
+    { name:"Vivian Voss - Experimental EROTICA", city:"Athens", country:"Greece", style:"Strip, Contemporary, Ballet, Experimental", IG:"https://www.instagram.com/vivianvoss_", coordinates:[37.9755648,23.7348324], website:"https://www.instagram.com/experimental.erotica", episode:{ number:"24", link:"https://www.stripjourney.com/episodes/episode24-vivian-voss" } },
+    { name:"Maria", city:"Zürich", country:"Switzerland", style:"Frame Up", IG:"https://www.instagram.com/the_walking_muse", coordinates:[47.3744489,8.5410422], episode:{ number:"22", link:"https://www.stripjourney.com/episodes/episode22-maria" } },
+    { name:"Viktoryia Kalashnikava", city:"Warsaw", country:"Poland", style:"Frame up strip", IG:"https://www.instagram.com/bodyofyourparty", coordinates:[52.2319581,21.0067249] },
+    { name:"Hanna Tapunova", city:"Lublin", country:"Poland", style:"Frame up strip", IG:"https://www.instagram.com/tapunovaa", coordinates:[51.250559,22.5701022] },
+    { name:"Alena", city:"Barrie", country:"Canada", style:"Strip", IG:"https://www.instagram.com/feelme.danceschool", coordinates:[44.3893208,-79.6901302] },
+    { name:"Margarita Shtrigel", city:"Helsinki", country:"Finland", style:"Frame Up Strip", IG:"https://www.instagram.com/msh_dance" },
+    { name:"Frame up strip Cyprus", city:"Limassol", country:"Cyprus", style:"Frame Up Strip", IG:"https://www.instagram.com/apotheos.dance", coordinates:[34.6852901,33.0332657] },
+    { name:"Anna Strok", city:"Warsaw", country:"Poland", style:"Frame Up", IG:"https://www.instagram.com/anna.strok_dance", coordinates:[52.2319581,21.0067249], website:"https://www.instagram.com/cablook_frameup", episode:{ number:"25", link:"https://www.stripjourney.com/episodes/episode25-anna-strok"} },
+    { name:"Anastasia Djun", city:"Berlin", country:"Germany", style:"Frame Up, high heels", IG:"https://www.instagram.com/ddjunna/", coordinates:[52.5173885,13.3951309], episode:{ number:"26", link:"https://www.stripjourney.com/episodes/episode26-djuna"} },
+    { name:"Yuliana Zolotova", city:"Novi Sad", country:"Serbia", style:"Frame Up Strip, high heels", IG:"https://www.instagram.com/yuliana_zolotova/", coordinates:[45.2551338,19.8451756], episode:{ number:"27", link:"https://www.stripjourney.com/episodes/episode27-yuliana-zolotova" } },
+    { name:"Tatiana Filipenko", city:"Ljubljana", country:"Slovenia", style:"Frame Up Strip", IG:"https://www.instagram.com/_filipena_/", coordinates:[46.0500268,14.5069289], episode:{ number:"28", link:"https://www.stripjourney.com/episodes/episode28-tatiana-filipenko" } },
+    { name:"Daria Gendina", city:"Vienna", country:"Austria", style:"Frame Up Strip", IG:"https://www.instagram.com/gendosska/", coordinates:[48.2083537,16.3725042], episode:{ number:"29", link:"https://www.stripjourney.com/episodes/episode29-daria-gendina" } },
+    { name:"Mariia Ratner", city:"Berlin", country:"Germany", style:"Frame up strip, Commercial, High Heels, Hip-Hop", IG:"https://www.instagram.com/ratner_ratner_" },
+    { name:"Nasti Hinak", city:"Vienna", country:"Austria", style:"Frame up", IG:"https://www.instagram.com/nasti_hinak", website:"https://www.instagram.com/frameup_austria" },
+    { name:"Nasti Hinak", city:"Brno", country:"Czech Republic", style:"Frame up", IG:"https://www.instagram.com/nasti_hinak", coordinates:[49.1922443,16.6113382], website:"https://www.instagram.com/frame_up_nation" },
+    { name:"Sofia Hristova", city:"Sofia", country:"Bulgaria", style:"Exotic Pole, Strip, Experimental, Contemporary", IG:"https://www.instagram.com/sofia.hrstova/", coordinates:[42.6977028,23.3217359] },
+    { name:"Sunny aVas", city:"Nuremberg", country:"Germany", style:"Frame up strip, Pole Exo, Aerial Heels", IG:"https://www.instagram.com/sunny.a.vas", website:"https://www.instagram.com/vas.circle", coordinates:[49.453872,11.077298] },
+    { name:"Saku Hana", city:"Amsterdam", country:"Netherlands", style:"Frame up, exotic pole, strip plastic", IG:"https://www.instagram.com/saku_hana__/" },
+    { name:"Evelina Dzjubenko", city:"Riga", country:"Latvia", style:"Frame-up strip", IG:"https://www.instagram.com/eve_dzjubenko/" },
+    { name:"Saku Hana", city:"Shanghai", country:"China", style:"Frame up, exotic pole, strip plastic", IG:"https://www.instagram.com/saku_hana__/", coordinates:[31.2312707,121.4700152] },
+    { name:"Polina Petropavlovskaia", city:"Barcelona", country:"Spain", style:"Frame Up", IG:"https://www.instagram.com/p_petropavlovskaya/", coordinates:[41.3825802,2.177073], website:"https://www.instagram.com/frameup_bcn", episode:{ number:"30", link:"https://www.stripjourney.com/episodes/episode30-polina"} },
+    { name:"Osnapitsalisa", city:"Lodz", country:"Poland", style:"Frame Up", IG:"https://www.instagram.com/osnapitsalisa", coordinates:[51.7687323,19.4569911] }
+  ];
+
+  const events=[
+    { name:"Tsok Tsok Contest", date:"13-03-2026 to 15-03-2026", url:"https://www.instagram.com/tsok.tsok.contest/", city:"Riga", lat:56.9496, lng:24.1052 },
+    { name:"Frame Up Weekend Vol. 7", date:"27-03-2026 to 28-03-2026", url:"https://www.frameupstrip.cz", city:"Prague", lat:50.0755, lng:14.4378 },
+    { name:"Stage 18+ Dancing Contest", date:"29-03-2026", url:"https://www.frameupstrip.cz/contest", city:"Prague", lat:50.0755, lng:14.4378 },
+    { name:"Enter Calibration", date:"17-04-2026", url:"https://www.instagram.com/enter.calibration/", city:"Amsterdam", lat:52.3676, lng:4.9041 },
+    { name:"Frame Up Strip Weekend Vol. 3", date:"25-04-2026 to 26-04-2026", url:"https://www.instagram.com/p/DVOURY_DWKE/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", city:"Belgrade", lat:44.7866, lng:20.4489 },
+    { name:"Metro Champ", date:"25-07-2026 to 26-07-2026", url:"https://www.instagram.com/metro_champ/", city:"Warsaw", lat:52.2297, lng:21.0122 },
+    { name:"Santa Pecadora Dance Camp 2026", date:"13-09-2026 to 18-09-2026", url:"https://www.instagram.com/p/DUjErR_jWJ8/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", city:"Barcelona", lat:41.3851, lng:2.1734 },
+    { name:"Frame Up Weekend", date:"30-05-2026 to 31-05-2026", url:"https://www.frame-up.uk/products/frame-up-weekend-%E2%80%94-london-(new-edition)", city:"London", country:"UK", lat:51.5074, lng:-0.1278 }
+  ];
+
+
+  const escMap={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>escMap[c]);
+  const safeUrl=u=>{try{const x=new URL(u,location.origin);return /^https?:$/i.test(x.protocol)?x.href:null}catch{return null}};
+  const parseYmd=s=>{const v=String(s||'').trim();let m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(v);if(m)return Date.UTC(+m[3],+m[2]-1,+m[1]);m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);if(m)return Date.UTC(+m[1],+m[2]-1,+m[3]);return null};
+  const parseRange=s=>{const p=String(s||'').split(/\s+to\s+/i);return{startMs:parseYmd(p[0]),endMs:parseYmd(p[1]||p[0])}};
+  const todayUtc=()=>{const d=new Date();return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())};
+  const pad2=n=>String(n).padStart(2,'0');
+  const fmtDateMs=ms=>{const d=new Date(ms);return `${pad2(d.getUTCDate())}-${pad2(d.getUTCMonth()+1)}-${d.getUTCFullYear()}`};
+  const fmtRange=(a,b)=>{const x=(a??b??Date.now());return a&&b&&a!==b?`${fmtDateMs(a)} - ${fmtDateMs(b)}`:fmtDateMs(x)};
+  const hasCoords=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180;
+  const norm=v=>String(v||'').trim().toLowerCase();
+  const normalizeCountry=v=>{
+    const x=norm(v).replace(/\./g,'');
+    const aliases={
+      uk:'united kingdom',
+      'great britain':'united kingdom',
+      britain:'united kingdom',
+      us:'united states',
+      usa:'united states',
+      'united states of america':'united states'
+    };
+    return aliases[x]||x;
+  };
+  const locationKey=(city,country)=>`${norm(city)||'unknown-city'}|${normalizeCountry(country)||'unknown-country'}`;
+
+  const teacherRows=teachers.map((t,i)=>{const lat=t?.coordinates?.[0],lng=t?.coordinates?.[1],ok=hasCoords(lat,lng);const r={id:`t-${i}`,type:'teacher',name:String(t?.name||'Unnamed teacher'),city:String(t?.city||''),country:String(t?.country||''),style:String(t?.style||''),ig:safeUrl(t?.IG),website:safeUrl(t?.website),episodeNumber:t?.episode?.number?String(t.episode.number):'',episodeLink:safeUrl(t?.episode?.link),lat:ok?Number(lat):null,lng:ok?Number(lng):null};r.search=[r.name,r.city,r.country,r.style].join(' ').toLowerCase();return r});
+  const eventRows=events.map((e,i)=>{const lat=Number(e?.lat),lng=Number(e?.lng),ok=hasCoords(lat,lng),rg=parseRange(e?.date);const r={id:`e-${i}`,type:'event',name:String(e?.name||'Unnamed event'),city:String(e?.city||''),country:String(e?.country||''),url:safeUrl(e?.url),rawDate:String(e?.date||''),startMs:rg.startMs,endMs:rg.endMs,lat:ok?lat:null,lng:ok?lng:null};r.search=[r.name,r.city,r.country,r.rawDate].join(' ').toLowerCase();return r});
+
+  for(const t of teacherRows) t.locationKey=locationKey(t.city,t.country);
+  for(const e of eventRows) e.locationKey=locationKey(e.city,e.country);
+
+  const canonicalCoordsByLocation=new Map();
+  for(const t of teacherRows){
+    if(t.lat!=null && !canonicalCoordsByLocation.has(t.locationKey)) canonicalCoordsByLocation.set(t.locationKey,[t.lat,t.lng]);
+  }
+  for(const e of eventRows){
+    if(e.lat!=null && !canonicalCoordsByLocation.has(e.locationKey)) canonicalCoordsByLocation.set(e.locationKey,[e.lat,e.lng]);
+  }
+  for(const t of teacherRows){
+    const coords=canonicalCoordsByLocation.get(t.locationKey);
+    if(coords){ [t.lat,t.lng]=coords; }
+  }
+  for(const e of eventRows){
+    const coords=canonicalCoordsByLocation.get(e.locationKey);
+    if(coords){ [e.lat,e.lng]=coords; }
+  }
+
+  const teacherById=new Map(teacherRows.map(r=>[r.id,r]));
+  const eventById=new Map(eventRows.map(r=>[r.id,r]));
+  const teacherGroups=new Map();
+  for(const t of teacherRows){const k=t.locationKey;let g=teacherGroups.get(k);if(!g){g={city:t.city||'Unknown city',country:t.country||'',coords:t.lat!=null?[t.lat,t.lng]:null,ids:[]};teacherGroups.set(k,g)}if(!g.coords&&t.lat!=null)g.coords=[t.lat,t.lng];g.ids.push(t.id)}
+  const eventGroups=new Map();
+  for(const e of eventRows){if(e.lat==null)continue;const k=e.locationKey;let g=eventGroups.get(k);if(!g){g={city:e.city||'Unknown city',country:e.country||'',coords:[e.lat,e.lng],ids:[]};eventGroups.set(k,g)}g.ids.push(e.id)}
+
+  const map=L.map('sj-map',{worldCopyJump:true,scrollWheelZoom:true}).setView([20,10],2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:20,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'}).addTo(map);
+  const teacherLayer=L.layerGroup().addTo(map),eventLayer=L.layerGroup().addTo(map);
+  let teacherMarkerById=new Map(),eventMarkerById=new Map();
+
+  const state={type:'all',query:'',showPast:false};
+  const teacherColor=getComputedStyle(document.documentElement).getPropertyValue('--teacher').trim()||'#2f6da3';
+  const cardsEl=document.getElementById('sj-cards'),titleEl=document.getElementById('sj-list-title'),noteEl=document.getElementById('sj-note');
+  const searchEl=document.getElementById('sj-search'),showPastEl=document.getElementById('sj-show-past'),typeWrap=document.getElementById('sj-type'),fitBtn=document.getElementById('sj-fit');
+
+  const mTeachers=()=>state.type==='event'?[]:teacherRows.filter(t=>!state.query||t.search.includes(state.query));
+  const mEvents=()=>state.type==='teacher'?[]:eventRows.filter(e=>(state.showPast||!(e.endMs!=null&&e.endMs<todayUtc()))&&(!state.query||e.search.includes(state.query)));
+  const popupTeachers=(g,ids)=>`<strong>${esc(g.city)}${g.country?`, ${esc(g.country)}`:''}</strong><ul>${ids.map(id=>{const t=teacherById.get(id);const links=[t.website?`<a href="${t.website}" target="_blank" rel="noopener noreferrer">Website</a>`:'',t.ig?`<a href="${t.ig}" target="_blank" rel="noopener noreferrer">Instagram</a>`:'',t.episodeLink?`<a href="${t.episodeLink}" target="_blank" rel="noopener noreferrer">Episode ${esc(t.episodeNumber)}</a>`:''].filter(Boolean).join(' · ');return `<li><strong>${esc(t.name)}</strong>${t.style?` <span class="sj-muted">(${esc(t.style)})</span>`:''}<br>${links||'<span class="sj-muted">No links</span>'}</li>`}).join('')}</ul>`;
+  const popupEvents=(g,ids)=>`<strong>${esc(g.city)}${g.country?`, ${esc(g.country)}`:''}</strong><ul>${ids.map(id=>{const e=eventById.get(id);return `<li><strong>${esc(e.name)}</strong><br>${esc(fmtRange(e.startMs,e.endMs))}<br>${(e.url?`<a href="${e.url}" target="_blank" rel="noopener noreferrer">Event link</a>`:'<span class="sj-muted">No link</span>')}</li>`}).join('')}</ul>`;
+
+  function renderMap(){teacherLayer.clearLayers();eventLayer.clearLayers();teacherMarkerById=new Map();eventMarkerById=new Map();const tSet=new Set(mTeachers().map(t=>t.id)),eSet=new Set(mEvents().map(e=>e.id));
+    for(const g of teacherGroups.values()){const ids=g.ids.filter(id=>tSet.has(id));if(!ids.length||!g.coords)continue;const m=L.circleMarker(g.coords,{radius:ids.length>1?10:8,color:'#ffffff',weight:2,fillColor:teacherColor,fillOpacity:.94}).bindPopup(popupTeachers(g,ids),{maxWidth:360});m._teacherIds=ids;m.addTo(teacherLayer);ids.forEach(id=>teacherMarkerById.set(id,m));}
+    for(const g of eventGroups.values()){const ids=g.ids.filter(id=>eSet.has(id));if(!ids.length)continue;const c=ids.length;const icon=L.divIcon({className:'',html:`<div class="sj-event-pin">${c>1?c:'E'}</div>`,iconSize:[24,24],iconAnchor:[12,12]});const m=L.marker(g.coords,{icon}).bindPopup(popupEvents(g,ids),{maxWidth:360});m._eventIds=ids;m.addTo(eventLayer);ids.forEach(id=>eventMarkerById.set(id,m));}
+  }
+
+  function listItems(){const q=!!state.query,out=[];if(q){mTeachers().forEach(t=>out.push({...t,hasCoords:t.lat!=null}));mEvents().forEach(e=>out.push({...e,hasCoords:e.lat!=null}));}else{const b=map.getBounds();teacherLayer.eachLayer(m=>{if(!b.contains(m.getLatLng()))return;(m._teacherIds||[]).forEach(id=>out.push({...teacherById.get(id),hasCoords:true}))});eventLayer.eachLayer(m=>{if(!b.contains(m.getLatLng()))return;(m._eventIds||[]).forEach(id=>out.push({...eventById.get(id),hasCoords:true}))});}
+    out.sort((a,b)=>a.type!==b.type?(a.type==='event'?-1:1):(a.type==='event'?((a.startMs??Infinity)-(b.startMs??Infinity)||a.city.localeCompare(b.city)||a.name.localeCompare(b.name)):(a.city.localeCompare(b.city)||a.name.localeCompare(b.name))));
+    return out;
+  }
+
+  function renderList(){const items=listItems(),q=!!state.query,unmapped=q?items.filter(x=>!x.hasCoords).length:0;titleEl.textContent=q?`Search results (${items.length})`:`Items in view (${items.length})`;noteEl.textContent=unmapped?`${unmapped} result(s) have no coordinates and cannot be pinned on the map.`:'';if(!items.length){cardsEl.innerHTML='<p class="sj-muted">No results.</p>';return;}
+    cardsEl.innerHTML=items.map(x=>{if(x.type==='teacher'){const links=[];if(x.website)links.push(`<a href="${x.website}" target="_blank" rel="noopener noreferrer">Website</a>`);if(x.ig)links.push(`<a href="${x.ig}" target="_blank" rel="noopener noreferrer">Instagram</a>`);if(x.episodeLink)links.push(`<a href="${x.episodeLink}" target="_blank" rel="noopener noreferrer">Episode ${esc(x.episodeNumber||'')}</a>`);return `<div class="sj-card sj-card--teacher" data-type="teacher" data-id="${esc(x.id)}"><span class="sj-card-kind">Teacher</span><h3>${esc(x.name)}</h3><p><strong>Location:</strong> ${esc(x.city)}${x.country?`, ${esc(x.country)}`:''}</p>${x.style?`<p><strong>Style:</strong> ${esc(x.style)}</p>`:''}${!x.hasCoords?`<p class="sj-muted">No map coordinates</p>`:''}<p class="sj-links">${links.join(' ')||'<span class="sj-muted">No links</span>'}</p></div>`;}const eventLink=x.url?`<a href="${x.url}" target="_blank" rel="noopener noreferrer">Event link</a>`:'<span class="sj-muted">No link</span>';return `<div class="sj-card sj-card--event" data-type="event" data-id="${esc(x.id)}"><span class="sj-card-kind">Event</span><h3>${esc(x.name)}</h3><p><strong>Date:</strong> ${esc(fmtRange(x.startMs,x.endMs))}</p><p><strong>Location:</strong> ${esc(x.city)}${x.country?`, ${esc(x.country)}`:''}</p>${!x.hasCoords?`<p class="sj-muted">No map coordinates</p>`:''}<p class="sj-links">${eventLink}</p></div>`;}).join('');
+  }
+
+  const fitVisible=()=>{const pts=[];teacherLayer.eachLayer(m=>pts.push(m.getLatLng()));eventLayer.eachLayer(m=>pts.push(m.getLatLng()));if(pts.length)map.fitBounds(L.latLngBounds(pts).pad(.2));};
+  const renderAll=()=>{renderMap();renderList();};
+  const debounce=(fn,ms)=>{let t;return()=>{clearTimeout(t);t=setTimeout(fn,ms)}};
+
+  typeWrap.addEventListener('click',e=>{const b=e.target.closest('button[data-type]');if(!b)return;state.type=b.dataset.type;[...typeWrap.querySelectorAll('button')].forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderAll();fitVisible();});
+  showPastEl.addEventListener('change',()=>{state.showPast=showPastEl.checked;renderAll();});
+  searchEl.addEventListener('input',debounce(()=>{state.query=searchEl.value.trim().toLowerCase();renderAll();},180));
+  map.on('moveend',()=>{if(!state.query)renderList();});
+  cardsEl.addEventListener('click',e=>{if(e.target.closest('a'))return;const c=e.target.closest('.sj-card');if(!c)return;const m=c.dataset.type==='teacher'?teacherMarkerById.get(c.dataset.id):eventMarkerById.get(c.dataset.id);if(m){map.panTo(m.getLatLng());m.openPopup();}});
+  fitBtn.addEventListener('click',fitVisible);
+
+  showPastEl.checked=false;state.showPast=false;renderAll();fitVisible();
+});
+</script>
