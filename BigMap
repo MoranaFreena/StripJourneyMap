@@ -115,10 +115,171 @@
 .sj-muted{color:var(--muted)}
 #sj-wrap .leaflet-popup-content{font-family:'Manrope',sans-serif}
 .sj-event-pin{width:22px;height:22px;border-radius:4px;border:2px solid #fff;background:var(--event);color:#fff;display:flex;align-items:center;justify-content:center;font:700 10px/1 'Manrope',sans-serif;box-shadow:0 5px 12px rgba(41,48,66,.25)}
+.sj-snake{
+  margin-top:16px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 10px 24px rgba(28,38,64,.07);
+}
+.sj-snake-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.sj-snake-head h2{
+  margin:0;
+  font:700 1.2rem/1.2 'Fraunces',serif;
+}
+.sj-snake-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+.sj-snake-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.sj-snake-btn{
+  border:1px solid #c5cfdf;
+  background:#fff;
+  color:#334155;
+  padding:9px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.18s ease;
+}
+.sj-snake-btn:hover{background:#eef3f9;border-color:#9fb0cb}
+.sj-snake-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(240px,.7fr);
+  gap:14px;
+}
+.sj-snake-board-shell{
+  position:relative;
+  border:1px solid #d7deeb;
+  border-radius:14px;
+  overflow:hidden;
+  background:
+    radial-gradient(700px 280px at 15% 0%, rgba(184,106,42,.12) 0%, transparent 60%),
+    radial-gradient(740px 300px at 100% 0%, rgba(47,109,163,.14) 0%, transparent 65%),
+    #f8f5ee;
+}
+#sj-snake-canvas{
+  display:block;
+  width:100%;
+  aspect-ratio:14 / 9;
+  touch-action:none;
+}
+.sj-snake-status{
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(201,210,224,.9);
+  color:#334155;
+  font-size:14px;
+  pointer-events:none;
+}
+.sj-snake-panel{
+  border:1px solid #d9dfeb;
+  border-radius:14px;
+  padding:12px;
+  background:linear-gradient(180deg,#fff,#fbfcff);
+}
+.sj-snake-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+.sj-snake-metric{
+  border:1px solid #e2e7f0;
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+}
+.sj-snake-metric span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:4px;
+}
+.sj-snake-metric strong{
+  font-size:1.05rem;
+  color:#1f2937;
+}
+.sj-snake-target{
+  border:1px solid #e2e7f0;
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+}
+.sj-snake-target h3{
+  margin:0 0 4px;
+  font-size:1rem;
+}
+.sj-snake-target p{
+  margin:4px 0;
+  font-size:14px;
+  color:#334155;
+}
+.sj-snake-token{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  border-radius:999px;
+  padding:4px 8px;
+}
+.sj-snake-token--teacher{background:var(--teacher-soft);color:#1f4d73}
+.sj-snake-token--event{background:var(--event-soft);color:#744217}
+.sj-snake-help{
+  margin:12px 0 0;
+  font-size:13px;
+  color:#475569;
+}
+.sj-snake-dpad{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:repeat(3,56px);
+  justify-content:center;
+  gap:8px;
+}
+.sj-snake-dpad button{
+  border:1px solid #cbd4e2;
+  background:#fff;
+  color:#334155;
+  border-radius:12px;
+  min-height:48px;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+.sj-snake-dpad button:active{background:#edf2f9}
+.sj-snake-dpad .sj-snake-empty{
+  visibility:hidden;
+  pointer-events:none;
+}
 @media (max-width:980px){
   #sj-main{grid-template-columns:1fr}
   #sj-map{height:58vh;min-height:360px}
   #sj-list-panel{max-height:none;overflow:visible;border-radius:14px}
+  .sj-snake-layout{grid-template-columns:1fr}
 }
 @media (max-width:620px){
   .sj-title p{width:100%}
@@ -126,6 +287,9 @@
   .sj-controls{gap:6px}
   #sj-type button{padding:7px 9px;font-size:13px}
   .sj-toggle,#sj-fit{font-size:13px}
+  .sj-snake{padding:12px}
+  .sj-snake-metrics{grid-template-columns:1fr 1fr}
+  .sj-snake-dpad{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 <div id="sj-wrap">
@@ -160,6 +324,52 @@
       <div id="sj-cards"></div>
     </aside>
   </div>
+
+  <section class="sj-snake" aria-labelledby="sj-snake-title">
+    <div class="sj-snake-head">
+      <div>
+        <h2 id="sj-snake-title">StripMap Snake</h2>
+        <p>Collect teachers and events from their mapped locations before you hit the wall or yourself.</p>
+      </div>
+      <div class="sj-snake-actions">
+        <button id="sj-snake-pause" class="sj-snake-btn" type="button">Pause</button>
+        <button id="sj-snake-restart" class="sj-snake-btn" type="button">Restart</button>
+      </div>
+    </div>
+    <div class="sj-snake-layout">
+      <div class="sj-snake-board-shell">
+        <canvas id="sj-snake-canvas" width="840" height="540" aria-label="Snake game board" role="img"></canvas>
+        <div id="sj-snake-status" class="sj-snake-status">Use arrow keys or WASD to move. Press Space to pause and R to restart.</div>
+      </div>
+      <aside class="sj-snake-panel">
+        <div class="sj-snake-metrics">
+          <div class="sj-snake-metric">
+            <span>Score</span>
+            <strong id="sj-snake-score">0</strong>
+          </div>
+          <div class="sj-snake-metric">
+            <span>Collected</span>
+            <strong id="sj-snake-collected">0 / 0</strong>
+          </div>
+        </div>
+        <div id="sj-snake-target" class="sj-snake-target">
+          <span id="sj-snake-token-kind" class="sj-snake-token sj-snake-token--teacher">Teacher</span>
+          <h3 id="sj-snake-target-name">Loading…</h3>
+          <p id="sj-snake-target-meta" class="sj-muted"></p>
+          <p id="sj-snake-last" class="sj-muted"></p>
+        </div>
+        <p class="sj-snake-help">Keyboard: Arrow keys or WASD. Touch: use the directional pad below. Pause with Space/P.</p>
+        <div class="sj-snake-dpad" id="sj-snake-dpad" aria-label="Snake controls">
+          <span class="sj-snake-empty" aria-hidden="true"></span>
+          <button type="button" data-dir="up" aria-label="Move up">↑</button>
+          <span class="sj-snake-empty" aria-hidden="true"></span>
+          <button type="button" data-dir="left" aria-label="Move left">←</button>
+          <button type="button" data-dir="down" aria-label="Move down">↓</button>
+          <button type="button" data-dir="right" aria-label="Move right">→</button>
+        </div>
+      </aside>
+    </div>
+  </section>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -228,6 +438,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     { name:"Tsok Tsok Contest", date:"13-03-2026 to 15-03-2026", url:"https://www.instagram.com/tsok.tsok.contest/", city:"Riga", lat:56.9496, lng:24.1052 },
     { name:"Frame Up Weekend Vol. 7", date:"27-03-2026 to 28-03-2026", url:"https://www.frameupstrip.cz", city:"Prague", lat:50.0755, lng:14.4378 },
     { name:"Stage 18+ Dancing Contest", date:"29-03-2026", url:"https://www.frameupstrip.cz/contest", city:"Prague", lat:50.0755, lng:14.4378 },
+    { name:"Lola Land", date:"11-04-2026", url:"https://lola-land-neo-revue.de/", city:"Dusseldorf", country:"Germany", lat:51.2254018, lng:6.7763137 },
     { name:"Enter Calibration", date:"17-04-2026", url:"https://www.instagram.com/enter.calibration/", city:"Amsterdam", lat:52.3676, lng:4.9041 },
     { name:"Frame Up Strip Weekend Vol. 3", date:"25-04-2026 to 26-04-2026", url:"https://www.instagram.com/p/DVOURY_DWKE/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", city:"Belgrade", lat:44.7866, lng:20.4489 },
     { name:"Metro Champ", date:"25-07-2026 to 26-07-2026", url:"https://www.instagram.com/metro_champ/", city:"Warsaw", lat:52.2297, lng:21.0122 },
@@ -302,34 +513,4 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   const mTeachers=()=>state.type==='event'?[]:teacherRows.filter(t=>!state.query||t.search.includes(state.query));
   const mEvents=()=>state.type==='teacher'?[]:eventRows.filter(e=>(state.showPast||!(e.endMs!=null&&e.endMs<todayUtc()))&&(!state.query||e.search.includes(state.query)));
-  const popupTeachers=(g,ids)=>`<strong>${esc(g.city)}${g.country?`, ${esc(g.country)}`:''}</strong><ul>${ids.map(id=>{const t=teacherById.get(id);const links=[t.website?`<a href="${t.website}" target="_blank" rel="noopener noreferrer">Website</a>`:'',t.ig?`<a href="${t.ig}" target="_blank" rel="noopener noreferrer">Instagram</a>`:'',t.episodeLink?`<a href="${t.episodeLink}" target="_blank" rel="noopener noreferrer">Episode ${esc(t.episodeNumber)}</a>`:''].filter(Boolean).join(' · ');return `<li><strong>${esc(t.name)}</strong>${t.style?` <span class="sj-muted">(${esc(t.style)})</span>`:''}<br>${links||'<span class="sj-muted">No links</span>'}</li>`}).join('')}</ul>`;
-  const popupEvents=(g,ids)=>`<strong>${esc(g.city)}${g.country?`, ${esc(g.country)}`:''}</strong><ul>${ids.map(id=>{const e=eventById.get(id);return `<li><strong>${esc(e.name)}</strong><br>${esc(fmtRange(e.startMs,e.endMs))}<br>${(e.url?`<a href="${e.url}" target="_blank" rel="noopener noreferrer">Event link</a>`:'<span class="sj-muted">No link</span>')}</li>`}).join('')}</ul>`;
-
-  function renderMap(){teacherLayer.clearLayers();eventLayer.clearLayers();teacherMarkerById=new Map();eventMarkerById=new Map();const tSet=new Set(mTeachers().map(t=>t.id)),eSet=new Set(mEvents().map(e=>e.id));
-    for(const g of teacherGroups.values()){const ids=g.ids.filter(id=>tSet.has(id));if(!ids.length||!g.coords)continue;const m=L.circleMarker(g.coords,{radius:ids.length>1?10:8,color:'#ffffff',weight:2,fillColor:teacherColor,fillOpacity:.94}).bindPopup(popupTeachers(g,ids),{maxWidth:360});m._teacherIds=ids;m.addTo(teacherLayer);ids.forEach(id=>teacherMarkerById.set(id,m));}
-    for(const g of eventGroups.values()){const ids=g.ids.filter(id=>eSet.has(id));if(!ids.length)continue;const c=ids.length;const icon=L.divIcon({className:'',html:`<div class="sj-event-pin">${c>1?c:'E'}</div>`,iconSize:[24,24],iconAnchor:[12,12]});const m=L.marker(g.coords,{icon}).bindPopup(popupEvents(g,ids),{maxWidth:360});m._eventIds=ids;m.addTo(eventLayer);ids.forEach(id=>eventMarkerById.set(id,m));}
-  }
-
-  function listItems(){const q=!!state.query,out=[];if(q){mTeachers().forEach(t=>out.push({...t,hasCoords:t.lat!=null}));mEvents().forEach(e=>out.push({...e,hasCoords:e.lat!=null}));}else{const b=map.getBounds();teacherLayer.eachLayer(m=>{if(!b.contains(m.getLatLng()))return;(m._teacherIds||[]).forEach(id=>out.push({...teacherById.get(id),hasCoords:true}))});eventLayer.eachLayer(m=>{if(!b.contains(m.getLatLng()))return;(m._eventIds||[]).forEach(id=>out.push({...eventById.get(id),hasCoords:true}))});}
-    out.sort((a,b)=>a.type!==b.type?(a.type==='event'?-1:1):(a.type==='event'?((a.startMs??Infinity)-(b.startMs??Infinity)||a.city.localeCompare(b.city)||a.name.localeCompare(b.name)):(a.city.localeCompare(b.city)||a.name.localeCompare(b.name))));
-    return out;
-  }
-
-  function renderList(){const items=listItems(),q=!!state.query,unmapped=q?items.filter(x=>!x.hasCoords).length:0;titleEl.textContent=q?`Search results (${items.length})`:`Items in view (${items.length})`;noteEl.textContent=unmapped?`${unmapped} result(s) have no coordinates and cannot be pinned on the map.`:'';if(!items.length){cardsEl.innerHTML='<p class="sj-muted">No results.</p>';return;}
-    cardsEl.innerHTML=items.map(x=>{if(x.type==='teacher'){const links=[];if(x.website)links.push(`<a href="${x.website}" target="_blank" rel="noopener noreferrer">Website</a>`);if(x.ig)links.push(`<a href="${x.ig}" target="_blank" rel="noopener noreferrer">Instagram</a>`);if(x.episodeLink)links.push(`<a href="${x.episodeLink}" target="_blank" rel="noopener noreferrer">Episode ${esc(x.episodeNumber||'')}</a>`);return `<div class="sj-card sj-card--teacher" data-type="teacher" data-id="${esc(x.id)}"><span class="sj-card-kind">Teacher</span><h3>${esc(x.name)}</h3><p><strong>Location:</strong> ${esc(x.city)}${x.country?`, ${esc(x.country)}`:''}</p>${x.style?`<p><strong>Style:</strong> ${esc(x.style)}</p>`:''}${!x.hasCoords?`<p class="sj-muted">No map coordinates</p>`:''}<p class="sj-links">${links.join(' ')||'<span class="sj-muted">No links</span>'}</p></div>`;}const eventLink=x.url?`<a href="${x.url}" target="_blank" rel="noopener noreferrer">Event link</a>`:'<span class="sj-muted">No link</span>';return `<div class="sj-card sj-card--event" data-type="event" data-id="${esc(x.id)}"><span class="sj-card-kind">Event</span><h3>${esc(x.name)}</h3><p><strong>Date:</strong> ${esc(fmtRange(x.startMs,x.endMs))}</p><p><strong>Location:</strong> ${esc(x.city)}${x.country?`, ${esc(x.country)}`:''}</p>${!x.hasCoords?`<p class="sj-muted">No map coordinates</p>`:''}<p class="sj-links">${eventLink}</p></div>`;}).join('');
-  }
-
-  const fitVisible=()=>{const pts=[];teacherLayer.eachLayer(m=>pts.push(m.getLatLng()));eventLayer.eachLayer(m=>pts.push(m.getLatLng()));if(pts.length)map.fitBounds(L.latLngBounds(pts).pad(.2));};
-  const renderAll=()=>{renderMap();renderList();};
-  const debounce=(fn,ms)=>{let t;return()=>{clearTimeout(t);t=setTimeout(fn,ms)}};
-
-  typeWrap.addEventListener('click',e=>{const b=e.target.closest('button[data-type]');if(!b)return;state.type=b.dataset.type;[...typeWrap.querySelectorAll('button')].forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderAll();fitVisible();});
-  showPastEl.addEventListener('change',()=>{state.showPast=showPastEl.checked;renderAll();});
-  searchEl.addEventListener('input',debounce(()=>{state.query=searchEl.value.trim().toLowerCase();renderAll();},180));
-  map.on('moveend',()=>{if(!state.query)renderList();});
-  cardsEl.addEventListener('click',e=>{if(e.target.closest('a'))return;const c=e.target.closest('.sj-card');if(!c)return;const m=c.dataset.type==='teacher'?teacherMarkerById.get(c.dataset.id):eventMarkerById.get(c.dataset.id);if(m){map.panTo(m.getLatLng());m.openPopup();}});
-  fitBtn.addEventListener('click',fitVisible);
-
-  showPastEl.checked=false;state.showPast=false;renderAll();fitVisible();
-});
-</script>
+  const popupTeachers=(g,ids)=>`<strong>${esc(g.city)}${g.country?`, ${esc(g.country)}`:''}</strong><ul>${ids.map(id=>{const t=teacherById.get(id);const links=[t.website?`<a href="${t.website}" target="_blank" rel="noopener norefe
